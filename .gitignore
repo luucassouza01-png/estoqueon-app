@@ -1,0 +1,26 @@
+# Dependências
+node_modules/
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Ambiente
+.env
+.env.local
+
+# Backup
+*.bak
+*.tmp
+
+# Cache
+.cache/
+*.cache
