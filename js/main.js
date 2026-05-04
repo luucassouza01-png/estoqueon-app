@@ -1240,3 +1240,8 @@ function renderizarMonitorSLACompleto() {
     }
     
     if (agendados.length > 0) {
+        html += '<div style="text-align:center; padding:20px; font-size:0.9rem;">Total de agendados hoje: ' + agendados.length + '</div>';
+    }
+    
+    container.innerHTML = html;
+}
