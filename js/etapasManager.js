@@ -2,13 +2,13 @@
 const EtapasManager = (function() {
 
     const ETAPAS_LISTA = [
-        { id: 0, nome: '📋 Documentação na ADM', cor: '#6c8d9b' },
-        { id: 1, nome: '🚛 Chegada na Doca', cor: '#d97706' },
-        { id: 2, nome: '⏱️ Fim do Carregamento', cor: '#2c5f8a' },
-        { id: 3, nome: '✅ Finalizado', cor: '#10b981' }
+        { id: 0, nome: '📋 Documentação na ADM', cor: '#6c8d9b', requerDoca: false },
+        { id: 1, nome: '🚛 Chegada na Doca', cor: '#d97706', requerDoca: true },
+        { id: 2, nome: '⏱️ Fim do Carregamento', cor: '#2c5f8a', requerDoca: false },
+        { id: 3, nome: '✅ Finalizado', cor: '#10b981', requerDoca: false }
     ];
 
-    function avancarEtapa(agendamento, usuario) {
+    function avancarEtapa(agendamento, usuario, numeroDoca) {
         if (!agendamento) return { success: false, error: 'Agendamento inválido' };
         
         var etapaAtual = agendamento.etapa !== undefined ? agendamento.etapa : -1;
@@ -21,8 +21,17 @@ const EtapasManager = (function() {
         var etapaInfo = ETAPAS_LISTA[proximaEtapa];
         var timestamp = new Date().toISOString();
         
+        // Se a etapa requer doca, validar
+        if (etapaInfo.requerDoca && (!numeroDoca || numeroDoca === '')) {
+            return { success: false, error: 'Informe o número da doca', requerDoca: true };
+        }
+        
         agendamento.etapa = proximaEtapa;
         agendamento.etapaAtual = etapaInfo.nome;
+        
+        if (etapaInfo.requerDoca && numeroDoca) {
+            agendamento.numeroDoca = numeroDoca;
+        }
         
         if (!agendamento.historicoEtapas) {
             agendamento.historicoEtapas = [];
@@ -32,11 +41,12 @@ const EtapasManager = (function() {
             etapa: proximaEtapa,
             nome: etapaInfo.nome,
             timestamp: timestamp,
-            usuario: usuario
+            usuario: usuario,
+            numeroDoca: numeroDoca || null
         });
         
         // Se chegou na doca, inicia SLA
-        if (proximaEtapa === 1 && !agendamento.horaChegadaDoca) {
+        if (proximaEtapa === 1) {
             agendamento.horaChegadaDoca = timestamp;
             agendamento.status = 'EM_ANDAMENTO';
         }
@@ -84,6 +94,7 @@ const EtapasManager = (function() {
         if (etapaAnterior < 1) {
             agendamento.status = 'AGENDADO';
             agendamento.horaChegadaDoca = null;
+            agendamento.numeroDoca = null;
         }
         
         return { success: true, etapa: etapaInfo, agendamento: agendamento };
@@ -97,6 +108,13 @@ const EtapasManager = (function() {
     function getEtapaAtualNome(etapaAtual) {
         if (etapaAtual === undefined || etapaAtual < 0) return 'Aguardando';
         return ETAPAS_LISTA[etapaAtual] ? ETAPAS_LISTA[etapaAtual].nome : 'Desconhecido';
+    }
+
+    function getEtapaRequerDoca(etapaAtual) {
+        if (etapaAtual === undefined || etapaAtual < 0) return false;
+        var proximaEtapa = etapaAtual + 1;
+        if (proximaEtapa >= ETAPAS_LISTA.length) return false;
+        return ETAPAS_LISTA[proximaEtapa].requerDoca;
     }
 
     function renderizarTimeline(etapaAtual) {
@@ -124,6 +142,7 @@ const EtapasManager = (function() {
         voltarEtapa: voltarEtapa,
         getProgresso: getProgresso,
         getEtapaAtualNome: getEtapaAtualNome,
+        getEtapaRequerDoca: getEtapaRequerDoca,
         renderizarTimeline: renderizarTimeline
     };
 })();

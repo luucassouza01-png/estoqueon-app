@@ -1376,3 +1376,78 @@ window.confirmarDocaAvancar = function() {
     window.fecharModalDocaAvancar();
     window.avancarEtapa(parseInt(id), parseInt(numeroDoca));
 };
+
+// ==================== FUNÇÕES DE ETAPAS ====================
+window.avancarEtapa = function(id, numeroDoca) {
+    var agendamentos = AppState.getAgendamentos();
+    var agendamento = null;
+    var index = -1;
+    
+    for (var i = 0; i < agendamentos.length; i++) {
+        if (agendamentos[i].id == id) {
+            agendamento = agendamentos[i];
+            index = i;
+            break;
+        }
+    }
+    
+    if (!agendamento) {
+        showToast('Agendamento não encontrado!', true);
+        return;
+    }
+    
+    var etapaAtual = agendamento.etapa !== undefined ? agendamento.etapa : -1;
+    var requerDoca = (etapaAtual + 1 === 1);
+    
+    if (requerDoca && (!numeroDoca || numeroDoca === '')) {
+        var doca = prompt('Informe o número da doca para a etapa "Chegada na Doca":');
+        if (!doca) {
+            showToast('Número da doca é obrigatório!', true);
+            return;
+        }
+        numeroDoca = parseInt(doca);
+    }
+    
+    var resultado = EtapasManager.avancarEtapa(agendamento, usuarioAtual, numeroDoca);
+    
+    if (resultado.success) {
+        agendamentos[index] = resultado.agendamento;
+        AppState.persistirDados();
+        showToast('✅ Avançado para: ' + resultado.etapa.nome);
+        renderizarMonitorSLACompleto();
+        renderizarDashboardPrincipal();
+    } else {
+        showToast(resultado.error, true);
+    }
+};
+
+window.voltarEtapa = function(id) {
+    var agendamentos = AppState.getAgendamentos();
+    var agendamento = null;
+    var index = -1;
+    
+    for (var i = 0; i < agendamentos.length; i++) {
+        if (agendamentos[i].id == id) {
+            agendamento = agendamentos[i];
+            index = i;
+            break;
+        }
+    }
+    
+    if (!agendamento) {
+        showToast('Agendamento não encontrado!', true);
+        return;
+    }
+    
+    var resultado = EtapasManager.voltarEtapa(agendamento, usuarioAtual);
+    
+    if (resultado.success) {
+        agendamentos[index] = resultado.agendamento;
+        AppState.persistirDados();
+        showToast('↺ Voltado para: ' + resultado.etapa.nome);
+        renderizarMonitorSLACompleto();
+        renderizarDashboardPrincipal();
+    } else {
+        showToast(resultado.error, true);
+    }
+};
