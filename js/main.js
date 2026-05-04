@@ -1222,3 +1222,49 @@ if (Auth.isLogado()) {
 } else {
     renderizarTelaLogin();
 }
+// ==================== FUNÇÕES DE ETAPAS ====================
+window.avancarEtapa = function(id) {
+    var agendamentos = AppState.getAgendamentos();
+    var agendamento = null;
+    var index = -1;
+    for (var i = 0; i < agendamentos.length; i++) {
+        if (agendamentos[i].id === id) {
+            agendamento = agendamentos[i];
+            index = i;
+            break;
+        }
+    }
+    if (!agendamento) { showToast('Agendamento não encontrado!', true); return; }
+    var resultado = EtapasManager.avancarEtapa(agendamento, usuarioAtual);
+    if (resultado.success) {
+        agendamentos[index] = resultado.agendamento;
+        AppState.persistirDados();
+        showToast('✅ Avançado para: ' + resultado.etapa.nome);
+        var activeMenu = document.querySelector('.nav-item.active');
+        if (activeMenu && activeMenu.getAttribute('data-menu') === 'monitor') renderizarMonitorSLACompleto();
+        renderizarDashboardPrincipal();
+    } else { showToast(resultado.error, true); }
+};
+
+window.voltarEtapa = function(id) {
+    var agendamentos = AppState.getAgendamentos();
+    var agendamento = null;
+    var index = -1;
+    for (var i = 0; i < agendamentos.length; i++) {
+        if (agendamentos[i].id === id) {
+            agendamento = agendamentos[i];
+            index = i;
+            break;
+        }
+    }
+    if (!agendamento) { showToast('Agendamento não encontrado!', true); return; }
+    var resultado = EtapasManager.voltarEtapa(agendamento, usuarioAtual);
+    if (resultado.success) {
+        agendamentos[index] = resultado.agendamento;
+        AppState.persistirDados();
+        showToast('↺ Voltado para: ' + resultado.etapa.nome);
+        var activeMenu = document.querySelector('.nav-item.active');
+        if (activeMenu && activeMenu.getAttribute('data-menu') === 'monitor') renderizarMonitorSLACompleto();
+        renderizarDashboardPrincipal();
+    } else { showToast(resultado.error, true); }
+};

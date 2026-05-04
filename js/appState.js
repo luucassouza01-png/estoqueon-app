@@ -168,6 +168,9 @@ const AppState = (function() {
                     dataHoraAgendada: ag.dataHoraAgendada,
                     status: ag.status,
                     statusOriginal: ag.status,
+    etapa: -1,
+    etapaAtual: "🚪 Aguardando Chegada",
+    historicoEtapas: [],
                     tipoPalete: tipoPalete,
                     createdAt: new Date().toISOString(),
                     historicoEventos: [{
