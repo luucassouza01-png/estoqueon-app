@@ -23,4 +23,4 @@ Sistema de gestão de reversa de paletes para o Centro de Distribuição Assaí 
 - **Admin:** admin / admin123
 - **Operador:** (criado pelo Admin)
 
-Desenvolvido por Lucas Costa
+Desenvolvido por Lucas Costa 
