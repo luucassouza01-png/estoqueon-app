@@ -1020,9 +1020,10 @@ function renderizarMonitorSLACompleto() {
         '<div class="stat-mini" style="background:#e8f4f5;"><div class="stat-mini-value" style="color:#2c5f8a;">' + agendados.length + '</div><div>Agendados</div><div style="font-size:0.7rem;">para hoje</div></div>' +
         '</div>';
     
+    // Seção de EM ANDAMENTO com ETAPAS
     if (emAndamento.length > 0) {
         html += '<h3 style="margin: 24px 0 16px 0; color:#d97706; font-size:1rem; border-left:4px solid #d97706; padding-left:12px;"> EM ANDAMENTO - NA DOCA</h3>';
-        html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px;">';
+        html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 16px;">';
         
         for (var e = 0; e < emAndamento.length; e++) {
             var a = emAndamento[e];
@@ -1036,14 +1037,22 @@ function renderizarMonitorSLACompleto() {
             var tempoRestanteText = (tempoRestante >= 60) ? Math.floor(tempoRestante / 60) + 'h ' + (tempoRestante % 60) + 'min' : tempoRestante + 'min';
             var percProgresso = Math.min(100, Math.floor((tempoDecorrido / slaTotal) * 100));
             
+            // Timeline de etapas
+            var etapaAtual = a.etapa !== undefined ? a.etapa : -1;
+            if (a.status === 'EM_ANDAMENTO' && etapaAtual < 2) etapaAtual = 2;
+            
             html += '<div style="background: white; border-radius: 16px; padding: 16px; border: 1px solid #eef2f8;">' +
                 '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">' +
                 '<span style="font-weight: 700; font-size: 1rem;">Senha: ' + (a.senha || '-') + '</span>' +
                 '<span class="badge" style="background:#2c5f8a; color:white;">Doca ' + a.numeroDoca + '</span>' +
                 '</div>' +
                 '<div style="margin-bottom: 6px;"><strong>' + a.fornecedor + '</strong></div>' +
-                '<div style="font-size:0.8rem; color:#6c8d9b; margin-bottom: 6px;">' + a.veiculo + ' | ' + a.quantidade.toLocaleString() + ' paletes</div>' +
+                '<div style="font-size:0.8rem; color:#6c8d9b; margin-bottom: 6px;">Veículo: ' + a.veiculo + ' | ' + a.quantidade.toLocaleString() + ' paletes</div>' +
                 '<div style="font-size:0.8rem; color:#6c8d9b; margin-bottom: 12px;">Chegada: ' + chegadaDoca.toLocaleTimeString() + '</div>' +
+                
+                // TIMELINE DAS ETAPAS
+                '<div style="margin-top: 12px;">' + (typeof EtapasManager !== 'undefined' ? EtapasManager.renderizarTimeline(etapaAtual) : '<div style="background:#e2e8f0; border-radius:20px; height:6px; margin:12px 0;"></div>') + '</div>' +
+                
                 '<div style="background: #f0f2f5; border-radius: 12px; height: 8px; margin-bottom: 12px;">' +
                 '<div style="background: ' + (expirado ? '#dc2626' : '#d97706') + '; width: ' + percProgresso + '%; height: 8px; border-radius: 12px;"></div>' +
                 '</div>' +
@@ -1051,11 +1060,19 @@ function renderizarMonitorSLACompleto() {
                 '<div><span style="font-size:0.7rem; color:#6c8d9b;">Tempo em doca:</span><br><span style="font-weight: 700;">' + tempoDecorridoText + '</span></div>' +
                 '<div style="text-align:center;"><span style="font-size:0.7rem; color:#6c8d9b;">Restante SLA:</span><br><span style="font-weight: 700; ' + (expirado ? 'color:#dc2626' : 'color:#2c5f8a') + '">' + (expirado ? 'EXPIRADO!' : tempoRestanteText) + '</span></div>' +
                 '<button class="upload-btn" onclick="window.concluirAgendamento(' + a.id + ')" style="padding:6px 14px; background:#2c5f8a;">Concluir</button>' +
-                '</div></div>';
+                '</div>' +
+                // BOTÕES DE ETAPAS (avançar/voltar)
+                (typeof EtapasManager !== 'undefined' ? 
+                    '<div style="display: flex; gap: 8px; margin-top: 16px;">' +
+                        '<button class="upload-btn" onclick="window.avancarEtapa(' + a.id + ')" style="background:#10b981; padding:4px 12px; font-size:0.7rem;">✓ Avançar Etapa</button>' +
+                        '<button class="upload-btn" onclick="window.voltarEtapa(' + a.id + ')" style="background:#6c8d9b; padding:4px 12px; font-size:0.7rem;">↺ Voltar Etapa</button>' +
+                    '</div>' : '') +
+                '</div>';
         }
         html += '</div>';
     }
     
+    // Seção de Agendados
     if (agendados.length > 0) {
         html += '<h3 style="margin: 24px 0 16px 0; color:#2c5f8a; font-size:1rem; border-left:4px solid #2c5f8a; padding-left:12px;"> AGENDADOS - AGUARDANDO DOCA</h3>';
         html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px;">';
@@ -1072,7 +1089,7 @@ function renderizarMonitorSLACompleto() {
                 (atrasado ? '<span class="badge" style="background:#dc2626; color:white;">Atrasado</span>' : '<span class="badge" style="background:#2c5f8a; color:white;">Agendado</span>') +
                 '</div>' +
                 '<div style="margin-bottom: 6px;"><strong>' + a.fornecedor + '</strong></div>' +
-                '<div style="font-size:0.8rem; color:#6c8d9b; margin-bottom: 6px;">' + a.veiculo + ' | ' + a.quantidade.toLocaleString() + ' paletes</div>' +
+                '<div style="font-size:0.8rem; color:#6c8d9b; margin-bottom: 6px;">Veículo: ' + a.veiculo + ' | ' + a.quantidade.toLocaleString() + ' paletes</div>' +
                 '<div style="font-size:0.8rem; color:#6c8d9b; margin-bottom: 12px;">Agendado: ' + horario.toLocaleString() + (atrasado ? ' <span style="color:#dc2626;">(ATRASADO)</span>' : '') + '</div>' +
                 '<button class="upload-btn" onclick="window.abrirModalDoca(' + a.id + ')" style="width:100%; padding:8px; background:#d97706;"> Registrar Chegada na Doca</button>' +
                 '</div>';
@@ -1085,6 +1102,7 @@ function renderizarMonitorSLACompleto() {
     }
     html += '</div>';
     
+    // Modal
     html += '<div id="modalDoca" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">' +
         '<div style="background:white; border-radius:20px; padding:24px; width:400px; max-width:90%;">' +
         '<h3 style="margin-bottom:16px;"> Registrar Chegada na Doca</h3>' +
