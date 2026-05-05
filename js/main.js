@@ -748,29 +748,46 @@ function renderizarAgendamentos() {
     
     var agendados = AppState.getAgendamentosPendentes();
     
-    var html = '<div class="card"><div class="card-title">Agendamentos Pendentes</div>' +
+    var html = '<div class="card">' +
+        '<div class="card-title">Agendamentos Pendentes</div>' +
         '<div class="file-status" style="margin-bottom: 16px;">Total de agendamentos aguardando: ' + agendados.length + '</div>';
     
     if (agendados.length > 0) {
-        html += '<div style="overflow-x:auto;"><table style="width:100%"><thead><td>' +
-            '<th>Senha</th><th>Fornecedor</th><th>Data/Hora</th><th>Veiculo</th><th>Quantidade</th><th>Status</th>' +
-            '</tr></thead><tbody>';
+        html += '<div style="overflow-x:auto;">';
+        html += '<table style="width:100%; border-collapse: collapse;">';
+        html += '<thead>';
+        html += '<tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">';
+        html += '<th style="padding: 12px; text-align: left;">Senha</th>';
+        html += '<th style="padding: 12px; text-align: left;">Fornecedor</th>';
+        html += '<th style="padding: 12px; text-align: left;">Data/Hora</th>';
+        html += '<th style="padding: 12px; text-align: left;">Veículo</th>';
+        html += '<th style="padding: 12px; text-align: center;">Quantidade</th>';
+        html += '<th style="padding: 12px; text-align: center;">Status</th>';
+        html += '</td>';
+        html += '</thead>';
+        html += '<tbody>';
+        
         for (var i = 0; i < agendados.length; i++) {
             var a = agendados[i];
-            html += '<tr>' +
-                '<td>' + (a.senha || '-') + '</td>' +
-                '<td><strong>' + a.fornecedor + '</strong></td>' +
-                '<td>' + new Date(a.dataHoraAgendada).toLocaleString() + '</td>' +
-                '<td>' + a.veiculo + '</td>' +
-                '<td>' + a.quantidade.toLocaleString() + '</td>' +
-                '<td><span class="badge badge-warning">' + a.status + '</span></td>' +
-                '</tr>';
+            var dataHora = new Date(a.dataHoraAgendada);
+            var dataFormatada = dataHora.toLocaleString();
+            
+            html += '<tr style="border-bottom: 1px solid #eef2f8;">';
+            html += '<td style="padding: 12px;">' + (a.senha || '-') + '<\/td>';
+            html += '<td style="padding: 12px;"><strong>' + a.fornecedor + '</strong><\/td>';
+            html += '<td style="padding: 12px;">' + dataFormatada + '<\/td>';
+            html += '<td style="padding: 12px;">' + a.veiculo + '<\/td>';
+            html += '<td style="padding: 12px; text-align: center;">' + a.quantidade.toLocaleString() + '<\/td>';
+            html += '<td style="padding: 12px; text-align: center;"><span class="badge badge-warning">' + a.status + '<\/span><\/td>';
+            html += '<\/tr>';
         }
-        html += '</tbody></table></div>';
+        html += '</tbody>';
+        html += '<\/table>';
+        html += '<\/div>';
     } else {
         html += '<p style="text-align:center; padding:40px;">Nenhum agendamento pendente no momento</p>';
     }
-    html += '</div>';
+    html += '<\/div>';
     container.innerHTML = html;
 }
 
