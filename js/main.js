@@ -742,37 +742,7 @@ function renderizarDashboardPrincipal() {
 }
 
 // ==================== TELA DE AGENDAMENTOS ====================
-function renderizarAgendamentos() {
-    var container = document.getElementById('dynamicContent');
-    if (!container) return;
-    
-    var agendados = AppState.getAgendamentosPendentes();
-    
-    var html = '<div class="card"><div class="card-title">Agendamentos Pendentes</div>' +
-        '<div class="file-status" style="margin-bottom: 16px;">Total de agendamentos aguardando: ' + agendados.length + '</div>';
-    
-    if (agendados.length > 0) {
-        html += '<div style="overflow-x:auto;"><table style="width:100%"><thead><td>' +
-            '<th>Senha</th><th>Fornecedor</th><th>Data/Hora</th><th>Veiculo</th><th>Quantidade</th><th>Status</th>' +
-            '</tr></thead><tbody>';
-        for (var i = 0; i < agendados.length; i++) {
-            var a = agendados[i];
-            html += '<tr>' +
-                '<td>' + (a.senha || '-') + '</td>' +
-                '<td><strong>' + a.fornecedor + '</strong></td>' +
-                '<td>' + new Date(a.dataHoraAgendada).toLocaleString() + '</td>' +
-                '<td>' + a.veiculo + '</td>' +
-                '<td>' + a.quantidade.toLocaleString() + '</td>' +
-                '<td><span class="badge badge-warning">' + a.status + '</span></td>' +
-                '</tr>';
-        }
-        html += '</tbody></table></div>';
-    } else {
-        html += '<p style="text-align:center; padding:40px;">Nenhum agendamento pendente no momento</p>';
-    }
-    html += '</div>';
-    container.innerHTML = html;
-}
+/tmp/agendamentos_fixed.txt
 
 // ==================== TELA DE SALDO ====================
 function renderizarSaldoPaletes() {
@@ -1257,7 +1227,6 @@ function renderizarMonitorSLACompleto() {
                 '<div style="margin-bottom: 6px;"><strong>' + a.fornecedor + '</strong></div>' +
                 '<div style="font-size:0.8rem; color:#6c8d9b; margin-bottom: 6px;">Veículo: ' + a.veiculo + ' | ' + a.quantidade.toLocaleString() + ' paletes</div>' +
                 '<div style="font-size:0.8rem; color:#6c8d9b; margin-bottom: 12px;">Agendado: ' + horario.toLocaleString() + (atrasado ? ' <span style="color:#dc2626;">(ATRASADO)</span>' : '') + '</div>' +
-                '<button class="upload-btn" onclick="window.abrirModalDoca(' + a.id + ')" style="width:100%; padding:8px; background:#d97706;"> Registrar Chegada na Doca</button>' +
                 '</div>';
         }
         html += '</div>';
@@ -1270,7 +1239,6 @@ function renderizarMonitorSLACompleto() {
     
     html += '<div id="modalDoca" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">' +
         '<div style="background:white; border-radius:20px; padding:24px; width:400px; max-width:90%;">' +
-        '<h3 style="margin-bottom:16px;"> Registrar Chegada na Doca</h3>' +
         '<input type="hidden" id="modalAgendamentoId">' +
         '<div style="margin-bottom:16px;">' +
         '<label style="display:block; margin-bottom:8px; font-weight:500;">Numero da Doca:</label>' +
